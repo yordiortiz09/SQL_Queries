@@ -1,0 +1,18 @@
+SELECT TB1.RegionDescription,YEAR(orders.OrderDate) AS AÑO,
+SUM(`order details`.UnitPrice * `order details`.Quantity) AS CANTIDAD,
+Categories.CategoryName,Customers.CompanyName,Products.ProductName
+FROM orders 
+INNER JOIN `order details` ON `order details`.OrderID = orders.OrderID 
+INNER JOIN Products ON Products.ProductID =`order details`.ProductID
+INNER JOIN Categories ON Categories.CategoryID = Products.CategoryID
+INNER JOIN Customers ON  Customers.CustomerID = orders.CustomerID
+INNER JOIN 
+(
+SELECT DISTINCT region.RegionDescription,employeeterritories.EmployeeID 
+FROM  region INNER JOIN  territories ON region.RegionID = territories.RegionID 
+INNER JOIN   employeeterritories ON employeeterritories.TerritoryID = territories.TerritoryID
+GROUP BY  region.RegionDescription,employeeterritories.EmployeeID
+) AS TB1
+ON orders.EmployeeID = TB1.EmployeeID
+GROUP BY  TB1.RegionDescription,YEAR(orders.OrderDate),
+orders.CustomerID,Categories.CategoryName,Products.ProductName
